@@ -1,6 +1,6 @@
 
+using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class Symptom 
 {
@@ -18,9 +18,9 @@ public class Symptom
 
     public Answer getAnswer()
     {
-
+        Random rand = new Random();
         //случайно выбираем ответ из списка возможных
-        int answerCode = AnswersManifest[Random.Range(0, AnswersManifest.Count-1)];
+        int answerCode = AnswersManifest[rand.Next(0, AnswersManifest.Count-1)];
         //из конфигурационного файла считываем информацию
         //про ответ с Id равным answerCode и создаем объект Answer 
         //возвращаем этот объект

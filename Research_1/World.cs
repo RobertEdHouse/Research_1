@@ -4,15 +4,15 @@ using System.Collections.Generic;
 
 public class World 
 {
-    private int CurrentDay;
-    private int TotalDays;
-    private Player Avatar;
-    private List<Patient> Patients;
-    private List<Patient> DeadPatients;
-    private List<Symptom> Symptoms;
-    private List<Disease> Diseases;
-    private List<Question> Questions;
-    private List<Medicine> Medicines;
+    public int CurrentDay { get; private set; }
+    public int TotalDays { get; private set; }
+    public Player Avatar { get; private set; }
+    public List<Patient> Patients { get; private set; }
+    public List<Patient> DeadPatients { get; private set; }
+    public List<Symptom> Symptoms { get; private set; }
+    public List<Disease> Diseases { get; private set; }
+    public List<Question> Questions { get; private set; }
+    public List<Medicine> Medicines { get; private set; }
 
     public World()
     {
@@ -68,9 +68,8 @@ public class World
 
     public void SaveGame()
     {
-        WorldData world = new WorldData(
-            CurrentDay, TotalDays, Avatar, Patients, DeadPatients);
-        SaveLoad.SaveData(world);
+        
+        SaveLoad.SaveData(this);
     }
     public void LoadGame()
     {
