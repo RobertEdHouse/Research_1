@@ -68,6 +68,19 @@ public class Player
     {
         return Dialogs[dialogId];
     }
+
+    public List<Dialog> getDialogs(Patient patient)
+    {
+        List<Dialog> dialogs = new List<Dialog>();
+        foreach (Dialog dialog in Dialogs)
+        {
+            if (dialog.getPatient().Equals(patient))
+            {
+                dialogs.Add(dialog);
+            }
+        }
+        return dialogs;
+    }
     public void addDialog(Dialog dialog)
     {
         Dialogs.Add(dialog);

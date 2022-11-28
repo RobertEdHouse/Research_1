@@ -55,12 +55,12 @@ public class Patient
 
         CurrentState = State.ALIVE;
         Temperature = 36.7f;
-        Brain = 100;
-        Heart = 100;
-        Intestines = 100;
-        Liver = 100;
-        Lungs = 100;
-        Stomach = 100;
+        Brain = 10;
+        Heart = 10;
+        Intestines = 10;
+        Liver = 10;
+        Lungs = 10;
+        Stomach = 10;
     }
 
     ~Patient()
@@ -87,18 +87,27 @@ public class Patient
         Medicines.Add(medicine);
     }
 
-    public void nextDay()
+    public void nextDay(List<Symptom>symptoms,List<Disease> diseases)
     {
         //применить лекарства
         //изменить состояния болезней
-        updateSymptoms();
+        updateSymptoms(symptoms);
         //изменить состояния органов
         //изменить температуру в зависимости от состояния болезни
     }
 
-    private void updateSymptoms()
+    private void updateSymptoms(List<Symptom> symptoms)
     {
         Symptoms.Clear();
+        Disease randomDisease = Diseases[(new Random()).Next(Diseases.Count)];
+        foreach(Symptom sym in symptoms)
+        foreach(SymptomManifest symMan in randomDisease.getListSymptom())
+        {
+                if(sym.Id==symMan.Code)
+                    Symptoms.Add(sym);
+        }
+        
+       
         //на основе болезни обновить симптомы
     }
 
@@ -114,7 +123,7 @@ public class Patient
             }
         }
         Random rand = new Random();
-        Symptom symptomRandom = commonSymptoms[rand.Next(0, commonSymptoms.Count - 1)];
+        Symptom symptomRandom = commonSymptoms[rand.Next(commonSymptoms.Count)];
         return symptomRandom.getAnswer();
     }
     

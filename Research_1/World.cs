@@ -1,5 +1,6 @@
 
 
+using System;
 using System.Collections.Generic;
 
 public class World 
@@ -18,6 +19,13 @@ public class World
     {
         //заполняем Symptoms, Diseases, Questions,
         //Medicines из файла конфигурации
+        
+        Patients = new List<Patient>();
+        DeadPatients = new List<Patient>();
+        Symptoms = new List<Symptom>();
+        Diseases = new List<Disease>();
+        Questions = new List<Question>();
+        Medicines = new List<Medicine>();
         loadFromConfig();
     }
     
@@ -35,8 +43,10 @@ public class World
 
     private Patient initPatient()
     {
-        //заполнить случайными данными 
-        return null;
+        Random random = new Random();
+        Patient newPatien = new Patient("Мартiн", "Септiм", SexType.MALE, 100, Diseases[random.Next(Diseases.Count)]); 
+       
+        return newPatien;
     }
     private List<Medicine> getStandartMedicines()
     {
@@ -49,7 +59,7 @@ public class World
     {
         foreach (Patient patient in Patients)
         {
-            patient.nextDay();
+            patient.nextDay(Symptoms,null);
         }
         CurrentDay++;
         if (CurrentDay >= TotalDays)
@@ -91,19 +101,47 @@ public class World
     }
     private List<Symptom> loadSymptoms()
     {
-        //заполнить из файла конфигурации
-        return null;
+        List<int> answers = new List<int>();
+        answers.Add(0);
+        answers.Add(1);
+        List<Symptom> symptoms = new List<Symptom>();
+        symptoms.Add(new Symptom(0, "Головний бiль",answers));
+        answers = new List<int>();
+        answers.Add(2);
+        answers.Add(3);
+        symptoms.Add(new Symptom(1, "Бiль у животi", answers));
+        answers = new List<int>();
+        answers.Add(4);
+        answers.Add(5);
+        symptoms.Add(new Symptom(2, "Слабкість", answers));
+        return symptoms;
     }
 
     private List<Disease> loadDiseases()
     {
-        //заполнить из файла конфигурации
-        return null;
+        Random random = new Random();
+        List<SymptomManifest> listSymptoms = new List<SymptomManifest>();
+        listSymptoms.Add(new SymptomManifest(0, random.Next(100)));
+        listSymptoms.Add(new SymptomManifest(1, random.Next(100)));
+        listSymptoms.Add(new SymptomManifest(2, random.Next(100)));
+
+        List<Disease> list = new List<Disease>();
+        Disease disease1 = new Disease(0, "Отруєння", listSymptoms);
+        list.Add(disease1);
+        return list;
     }
     private List<Question> loadQuestions()
     {
-        //заполнить из файла конфигурации
-        return null;
+        List<int> symptomes = new List<int>();
+        symptomes.Add(0);
+        symptomes.Add(1);
+        
+        List<Question> questions = new List<Question>();
+        questions.Add(new Question(0, "Як себе почуваєте?", symptomes));
+        symptomes = new List<int>();
+        symptomes.Add(2);
+        questions.Add(new Question(1, "Якi вiдчуття?", symptomes));
+        return questions;
     }
 
     private List<Medicine> loadMedicines()
