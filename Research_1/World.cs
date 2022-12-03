@@ -15,6 +15,8 @@ public class World
     public List<Question> Questions { get; private set; }
     public List<Medicine> Medicines { get; private set; }
 
+    public Dictionary<string, Disease> treat;
+    public bool isGame = true;
     public World()
     {
         //заполняем Symptoms, Diseases, Questions,
@@ -26,6 +28,7 @@ public class World
         Diseases = new List<Disease>();
         Questions = new List<Question>();
         Medicines = new List<Medicine>();
+        treat = new Dictionary<string, Disease>();
         loadFromConfig();
     }
     
@@ -44,7 +47,7 @@ public class World
     private Patient initPatient()
     {
         Random random = new Random();
-        Patient newPatien = new Patient("Мартiн", "Септiм", SexType.MALE, 100, Diseases[random.Next(Diseases.Count)]); 
+        Patient newPatien = new Patient("Мартiн", "Септiм", SexType.MALE, 90, Diseases[random.Next(Diseases.Count)]); 
        
         return newPatien;
     }
@@ -52,14 +55,22 @@ public class World
     {
         //выбираем первые 4 лекарства в случайном
         //количественном соотношении и возвращаем
-        return null;
+        return Medicines;
     }
 
     public void nextDay()
     {
+        
         foreach (Patient patient in Patients)
         {
-            patient.nextDay(Symptoms,null);
+            patient.nextDay(Symptoms, treat);
+            if (patient.CurrentState == State.DEAD)
+            {
+                DeadPatients.Add(patient);
+                Patients.Remove(patient);
+                if (Patients.Count == 0)
+                    break;
+            }                
         }
         CurrentDay++;
         if (CurrentDay >= TotalDays)
@@ -125,8 +136,17 @@ public class World
         listSymptoms.Add(new SymptomManifest(1, random.Next(100)));
         listSymptoms.Add(new SymptomManifest(2, random.Next(100)));
 
+        List<int> listOrgans = new List<int>();
+        listOrgans.Add(1);
+        listOrgans.Add(0);
+        listOrgans.Add(3);
+        listOrgans.Add(0);
+        listOrgans.Add(0);
+        listOrgans.Add(3);
+
         List<Disease> list = new List<Disease>();
-        Disease disease1 = new Disease(0, "Отруєння", listSymptoms);
+        Disease disease1 = new Disease(0, "Отруєння", 5, listSymptoms);
+        disease1.setParamOrgan(listOrgans, true);
         list.Add(disease1);
         return list;
     }
@@ -147,18 +167,32 @@ public class World
     private List<Medicine> loadMedicines()
     {
         //заполнить из файла конфигурации
-        return null;
+        List<Medicine> list = new List<Medicine>();
+        Medicine medicine1 = new Medicine(0, "Панкреатин", 3, 100);
+        List<int> listOrgans = new List<int>();
+        listOrgans.Add(0);
+        listOrgans.Add(0);
+        listOrgans.Add(3);
+        listOrgans.Add(-1);
+        listOrgans.Add(0);
+        listOrgans.Add(2);
+        list.Add(medicine1);
+        medicine1.setParamOrgan(listOrgans);
+        treat.Add(medicine1.Type,Diseases[0]);
+        return list;
     }
-
-    
 
     public void endGame(int Karma)
     {
-        
+        Console.WriteLine("End Game");
+        isGame = false;
+        return;
     }
     public void gameOver()
     {
-
+        Console.WriteLine("Game Over");
+        isGame = false;
+        return;
     }
 }
 

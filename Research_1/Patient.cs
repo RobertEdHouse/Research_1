@@ -15,7 +15,8 @@ public enum SexType
     FEMALE
 }
 
-public class Patient 
+[Serializable]
+public class Patient
 {
 
     public string FirstName { get; }
@@ -24,16 +25,16 @@ public class Patient
 
 
     public State CurrentState { get; private set; }
-    public float Temperature { get; private set; }
+    public float Temperature { get; set; }
     private int Immunity;
 
 
-    public int Brain { get; private set; }
-    public int Heart { get; private set; }
-    public int Intestines { get; private set; }
-    public int Liver { get; private set; }
-    public int Lungs { get; private set; }
-    public int Stomach { get; private set; }
+    public int Brain { get; set; }
+    public int Heart { get; set; }
+    public int Intestines { get; set; }
+    public int Liver { get; set; }
+    public int Lungs { get; set; }
+    public int Stomach { get; set; }
 
 
     private List<Disease> Diseases;
@@ -74,12 +75,17 @@ public class Patient
     private void raiseTemperature()
     {
         Random rand = new Random();
-        Temperature += rand.Next(1,20)/10;
+        Temperature += (1 - (float)Immunity / 100) * ((rand.Next(3 - 1) + 1) );
     }
     private void lowerTemperature()
     {
         Random rand = new Random();
-        Temperature -= rand.Next(1, 20)/10;
+        float f = ((float)Immunity / 100) * ((rand.Next(3 - 1) + 1));
+        if (Temperature - f < 36.6)
+            Temperature = 36.6f;
+        else {
+            Temperature -= f;
+        }
     }
 
     public void takeMedicine(Medicine medicine)
@@ -87,36 +93,102 @@ public class Patient
         Medicines.Add(medicine);
     }
 
-    public void nextDay(List<Symptom>symptoms,List<Disease> diseases)
+    
+    public void nextDay(List<Symptom> symptoms, Dictionary<string, Disease> treat)
     {
         //применить лекарства
         //изменить состояния болезней
+        List<Disease> activeDiseases = Diseases;
+        foreach (Medicine med in Medicines)
+        {
+            foreach (Disease dis in Diseases)
+            {
+                Disease d = dis;
+                if (treat.TryGetValue(med.Type, out d) == true)
+                {
+                    if (d.Temperature == true)
+                        lowerTemperature();
+                    med.treatOrgans(this);
+                    activeDiseases.Remove(dis);
+                    if (activeDiseases.Count == 0)
+                        break;
+                }
+            }
+        }
+
+        List<Disease> diseases = Diseases;
+        foreach (Disease dis in Diseases)
+        {
+            if (dis.StagePercent <= 0)
+            {
+                diseases.Remove(dis);
+            }
+        }
+        Diseases = diseases;
+
+        Disease randomDisease = null;
+        if (activeDiseases.Count!=0)
+            randomDisease = Diseases[(new Random()).Next(Diseases.Count)];
+        
+        foreach (Disease dis in activeDiseases)
+        {
+            if (randomDisease.Id == dis.Id)
+            {
+                randomDisease.destroyOrgans(this);
+                if (randomDisease.Temperature)
+                    raiseTemperature();
+                changeState();
+            }
+            dis.raiseStage();
+        }
         updateSymptoms(symptoms);
+        
         //изменить состояния органов
         //изменить температуру в зависимости от состояния болезни
     }
 
+    private void treat(Dictionary<string, Disease> treat)
+    {
+        
+    }
+    private bool getTreat(string s,ref Disease d)
+    {
+        return true;
+    }
+    private void changeState()
+    {
+        if (Brain == 0 || Heart == 0 || 
+            Liver == 0 || Intestines == 0 || 
+            Lungs == 0 || Stomach == 0 )
+            this.CurrentState = State.DEAD;
+        foreach(Disease dis in Diseases)
+        {
+            if(dis.getStage()>=100)
+                this.CurrentState = State.DEAD;
+        }
+    }
     private void updateSymptoms(List<Symptom> symptoms)
     {
         Symptoms.Clear();
-        Disease randomDisease = Diseases[(new Random()).Next(Diseases.Count)];
-        foreach(Symptom sym in symptoms)
-        foreach(SymptomManifest symMan in randomDisease.getListSymptom())
-        {
-                if(sym.Id==symMan.Code)
-                    Symptoms.Add(sym);
-        }
-        
-       
+
+        foreach (Disease disease in Diseases)
+            foreach (Symptom sym in symptoms)
+                foreach (SymptomManifest symMan in disease.getListSymptom())
+                {
+                    if (sym.Id == symMan.Code)
+                        Symptoms.Add(sym);
+                }
+
+
         //на основе болезни обновить симптомы
     }
 
     public Answer answer(Question question)
     {
-        List<Symptom> commonSymptoms=new List<Symptom>();
+        List<Symptom> commonSymptoms = new List<Symptom>();
         foreach (int code in question.SymptomCodes)
         {
-            foreach(Symptom symptom in Symptoms)
+            foreach (Symptom symptom in Symptoms)
             {
                 if (code == symptom.Id)
                     commonSymptoms.Add(symptom);
@@ -126,5 +198,5 @@ public class Patient
         Symptom symptomRandom = commonSymptoms[rand.Next(commonSymptoms.Count)];
         return symptomRandom.getAnswer();
     }
-    
+
 }

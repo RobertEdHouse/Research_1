@@ -1,3 +1,6 @@
+using System;
+
+[Serializable]
 public class Dialog
 {
     public int Id { get; }

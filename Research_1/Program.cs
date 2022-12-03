@@ -9,7 +9,7 @@ namespace Research_1
         public static void Main()
         {
             World world = new World();
-            world.init(0, 4, 1, 100);
+            world.init(0, 5, 1, 100);
             Test test = new Test();
             test.Test1(world);
         }

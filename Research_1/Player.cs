@@ -1,6 +1,8 @@
 
+using System;
 using System.Collections.Generic;
 
+[Serializable]
 public class Player
 {
     public int Karma { get; private set; }
@@ -31,7 +33,7 @@ public class Player
         this.Money -= medicine.Price;
         foreach(Medicine m in Medicines)
         {
-            if (m.Equals(medicine.Type))
+            if (m.Id==medicine.Id)
             {
                 m.add(medicine.Count);
             }
@@ -75,6 +77,18 @@ public class Player
         foreach (Dialog dialog in Dialogs)
         {
             if (dialog.getPatient().Equals(patient))
+            {
+                dialogs.Add(dialog);
+            }
+        }
+        return dialogs;
+    }
+    public List<Dialog> getDialogs(int Day,Patient patient)
+    {
+        List<Dialog> dialogs = new List<Dialog>();
+        foreach (Dialog dialog in Dialogs)
+        {
+            if (dialog.getPatient().Equals(patient)&&dialog.Day==Day)
             {
                 dialogs.Add(dialog);
             }
